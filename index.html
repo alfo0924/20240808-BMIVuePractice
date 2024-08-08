@@ -41,7 +41,6 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"defer></script>
 
 <script defer>
-
     let weightSlider = document.getElementById("myWeight");
     let weightOutput = document.getElementById("inputWeight");
 
@@ -68,7 +67,26 @@
 
     weightSlider.addEventListener("input", updateValueWeight);
     heightSlider.addEventListener("input", updateValueHeight);
-    functio
+    function updateValueWeight(e) {
+        weightOutput.value = e.srcElement.value;
+    }
+    function updateValueHeight(e) {
+        heightOutput.value = e.srcElement.value;
+    }
+
+    function calculateBmi() {
+        let weight = document.bmiForm.realweight.value;
+        let height = (document.bmiForm.realheight.value)/100;
+        let realbmi = (weight)/Math.pow(height, 2);
+        let realbmiOutput = document.getElementById("yourbmi");
+        let messageOutput = document.getElementById("evaluationMessage");
+        let roundedBmi = realbmi.toFixed(1);
+        messageOutput.innerHTML = "";
+        realbmiOutput.innerHTML = " " + roundedBmi;
+        if (roundedBmi > 26) {
+            messageOutput.innerHTML = "<br>Start workout";
+        }
+    }
 
 </script>
 
