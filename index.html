@@ -9,26 +9,25 @@
         body {
             background: silver;
             padding-top: 2rem;
-            justify-content:space-evenly;
-            align-items: center;
-            text-align:center;
         }
         .bmiCal {
-            margin-bottom: 5rem;
+            margin-bottom: 2rem;
         }
-        .contBmi{
-            margin-top: 5rem;
-            padding: 25px;
+        .random-entry {
+            background-color: #e6f3ff; /* Light blue */
+        }
+        .user-entry {
+            background-color: #ffe6e6; /* Light red */
         }
     </style>
 </head>
 <body>
 
-<div class="contBmi container col-12 col-sm-12 col-md-9  ">
-    <div class="row ">
-        <div class="mx-auto">
-            <div class="card bmiCal ">
-                <div class="card-body  ">
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 mx-auto">
+            <div class="card bmiCal">
+                <div class="card-body">
                     <h1 class="card-title text-center mb-4">BMI Recording System</h1>
                     <form name="bmiForm" id="bmiForm">
                         <div class="mb-3">
@@ -63,8 +62,11 @@
     </div>
 
     <div class="row mt-4">
-        <div class="col-md-6 mx-auto">
+        <div class="col-md-8 mx-auto">
             <h2 class="text-center mb-3">Recorded BMI Data</h2>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <button id="clearAllRecords" class="btn btn-danger">Clear All Records</button>
+            </div>
             <table class="table table-striped">
                 <thead>
                 <tr>
@@ -88,6 +90,7 @@
     const bmiDataList = document.getElementById('bmiDataList');
     const generateRandomDataBtn = document.getElementById('generateRandomData');
     const generateNameBtn = document.getElementById('generateNameBtn');
+    const clearAllRecordsBtn = document.getElementById('clearAllRecords');
     const weightInput = document.getElementById('inputWeight');
     const heightInput = document.getElementById('inputHeight');
     const nameInput = document.getElementById('inputName');
@@ -126,10 +129,10 @@
         return 'Obese';
     }
 
-    function addPerson(name, height, weight) {
+    function addPerson(name, height, weight, isRandom = false) {
         const bmi = calculateBmi(weight, height);
         const status = getBmiStatus(bmi);
-        people.push({ name, height, weight, bmi, status });
+        people.push({ name, height, weight, bmi, status, isRandom });
         updateBmiList();
     }
 
@@ -137,6 +140,7 @@
         bmiDataList.innerHTML = '';
         people.forEach(person => {
             const row = document.createElement('tr');
+            row.className = person.isRandom ? 'random-entry' : 'user-entry';
             row.innerHTML = `
                 <td>${person.name}</td>
                 <td>${person.height}</td>
@@ -153,7 +157,7 @@
             const name = getRandomName();
             const weight = Math.floor(Math.random() * (180 - 25 + 1)) + 25;
             const height = Math.floor(Math.random() * (220 - 100 + 1)) + 100;
-            addPerson(name, height, weight);
+            addPerson(name, height, weight, true);
         }
     }
 
@@ -164,6 +168,12 @@
         const status = getBmiStatus(bmi);
         currentBmi.textContent = bmi;
         currentStatus.textContent = status;
+    }
+
+    function clearAllRecords() {
+        people.length = 0;
+        updateBmiList();
+        availableNames = [...commonNames];
     }
 
     weightInput.addEventListener('input', function() {
@@ -189,12 +199,18 @@
         }
         const weight = parseFloat(weightInput.value);
         const height = parseFloat(heightInput.value);
-        addPerson(name, height, weight);
+        addPerson(name, height, weight, false);
         nameInput.value = '';
     });
 
     generateRandomDataBtn.addEventListener('click', function() {
         generateRandomData(50);
+    });
+
+    clearAllRecordsBtn.addEventListener('click', function() {
+        if (confirm('Are you sure you want to clear all records?')) {
+            clearAllRecords();
+        }
     });
 
     // Initialize current BMI display
