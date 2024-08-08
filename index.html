@@ -1,129 +1,135 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>BMIVuePractice</title>
-
-
-
-<!--    import CDN-->
-<title>Bootstrap demo</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-<style>
-  body{
-    justify-content: space-evenly;
-    align-content: center;
-    align-items: center;
-    text-align: center;
-    background: silver;
-
-}
-  .bmiCal{
-    margin-top: 10rem;
-
-}
-
-
-</style>
-
-
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>BMI Recording System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <style>
+        body {
+            background: silver;
+            padding-top: 2rem;
+        }
+        .bmiCal {
+            margin-bottom: 2rem;
+        }
+    </style>
 </head>
 <body>
 
-
-
-<div class="bmiCal container col-12 col-sm-12 col-md-6   ">
-<form name="bmiForm">
-    <div class="card-body bmi-calculator">
-        <h1 class="card-title" style="margin-bottom: 1em;">Calculate your BMI</h1>
-        <div class="bmi-calculator-weight">
-            <input class="weight-slider" name="realweight" id="myWeight" type="range" min="25" max="180" value="60" />
-            <p style="margin-top: 1.8em;">
-                WEIGHT:
-                <input name="Teža" id="inputWeight" type="number" value="60" min="25" max="180" oninput="showValWeight(this.value)" />
-                <span id="weight"></span> kg
-            </p>
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 mx-auto">
+            <div class="card bmiCal">
+                <div class="card-body">
+                    <h1 class="card-title text-center mb-4">BMI Recording System</h1>
+                    <form name="bmiForm" id="bmiForm">
+                        <div class="mb-3">
+                            <label for="inputName" class="form-label">Name:</label>
+                            <input type="text" class="form-control" id="inputName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="inputWeight" class="form-label">Weight (kg):</label>
+                            <input type="number" class="form-control" id="inputWeight" min="25" max="180" value="60" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="inputHeight" class="form-label">Height (cm):</label>
+                            <input type="number" class="form-control" id="inputHeight" min="100" max="220" value="160" required>
+                        </div>
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary">Calculate and Add</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="text-center mt-3">
+                <button id="generateRandomData" class="btn btn-secondary">Generate 50 Random Data</button>
+            </div>
         </div>
-        <div class="bmi-calculator-height">
-            <input class="height-slider" name="realheight" id="myHeight" type="range" min="100" max="220" value="160">
-            <p style="margin-top: 1.8em;">
-                HEIGHT:
-                <input name="Višina" id="inputHeight" type="number" value="160" min="100" max="220" oninput="showValHeight(this.value)" />
-                <span id="height"></span> cm
-            </p>
-        </div>
-        <input class="gumb" type="button" value="Calculate" onclick="calculateBmi()" style="margin-top: 0.5em">
-        <p style="margin-top: 1em;font-size: 1.2em;">
-            <strong>Your BMI:</strong>
-            <span id="yourbmi" style="font-size: 1.2em;margin-left: 8px;"></span>
-        </p>
-        <p></p>
-        <p>
-            <span id="evaluationMessage"></span>
-        </p>
     </div>
-</form>
+
+    <div class="row mt-4">
+        <div class="col-md-8 mx-auto">
+            <h2 class="text-center mb-3">Recorded BMI Data</h2>
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Height (cm)</th>
+                    <th>Weight (kg)</th>
+                    <th>BMI</th>
+                    <th>Status</th>
+                </tr>
+                </thead>
+                <tbody id="bmiDataList"></tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
+<script>
+    const bmiForm = document.getElementById('bmiForm');
+    const bmiDataList = document.getElementById('bmiDataList');
+    const generateRandomDataBtn = document.getElementById('generateRandomData');
+    const people = [];
 
-<h1> </h1>
-
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"defer></script>
-
-<script defer>
-    let weightSlider = document.getElementById("myWeight");
-    let weightOutput = document.getElementById("inputWeight");
-
-    let heightSlider = document.getElementById("myHeight");
-    let heightOutput = document.getElementById("inputHeight");
-
-    weightOutput.innerHTML = weightSlider.value;
-    heightOutput.innerHTML = heightSlider.value;
-
-    weightSlider.oninput = function () {
-        weightOutput.innerHTML = this.value;
-    }
-    heightSlider.oninput = function () {
-        heightOutput.innerHTML = this.value;
+    function calculateBmi(weight, height) {
+        return (weight / Math.pow(height / 100, 2)).toFixed(1);
     }
 
-    function showValWeight(newVal) {
-        weightSlider.value=newVal;
-    };
-
-    function showValHeight(newVal) {
-        heightSlider.value=newVal;
-    };
-
-    weightSlider.addEventListener("input", updateValueWeight);
-    heightSlider.addEventListener("input", updateValueHeight);
-    function updateValueWeight(e) {
-        weightOutput.value = e.srcElement.value;
-    }
-    function updateValueHeight(e) {
-        heightOutput.value = e.srcElement.value;
+    function getBmiStatus(bmi) {
+        if (bmi < 18.5) return 'Underweight';
+        if (bmi >= 18.5 && bmi < 25) return 'Healthy';
+        if (bmi >= 25 && bmi < 30) return 'Overweight';
+        return 'Obese';
     }
 
-    function calculateBmi() {
-        let weight = document.bmiForm.realweight.value;
-        let height = (document.bmiForm.realheight.value)/100;
-        let realbmi = (weight)/Math.pow(height, 2);
-        let realbmiOutput = document.getElementById("yourbmi");
-        let messageOutput = document.getElementById("evaluationMessage");
-        let roundedBmi = realbmi.toFixed(1);
-        messageOutput.innerHTML = "";
-        realbmiOutput.innerHTML = " " + roundedBmi;
-        if (roundedBmi > 26) {
-            messageOutput.innerHTML = "<br>Start workout";
+    function addPerson(name, height, weight) {
+        const bmi = calculateBmi(weight, height);
+        const status = getBmiStatus(bmi);
+        people.push({ name, height, weight, bmi, status });
+        updateBmiList();
+    }
+
+    function updateBmiList() {
+        bmiDataList.innerHTML = '';
+        people.forEach(person => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${person.name}</td>
+                <td>${person.height}</td>
+                <td>${person.weight}</td>
+                <td>${person.bmi}</td>
+                <td>${person.status}</td>
+            `;
+            bmiDataList.appendChild(row);
+        });
+    }
+
+    function generateRandomData(num) {
+        for (let i = 0; i < num; i++) {
+            const name = `Person ${people.length + 1}`;
+            const weight = Math.floor(Math.random() * (180 - 25 + 1)) + 25;
+            const height = Math.floor(Math.random() * (220 - 100 + 1)) + 100;
+            addPerson(name, height, weight);
         }
     }
 
-</script>
+    bmiForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const name = document.getElementById('inputName').value;
+        const weight = parseFloat(document.getElementById('inputWeight').value);
+        const height = parseFloat(document.getElementById('inputHeight').value);
+        addPerson(name, height, weight);
+        bmiForm.reset();
+    });
 
+    generateRandomDataBtn.addEventListener('click', function() {
+        generateRandomData(50);
+    });
+</script>
 
 </body>
 </html>
