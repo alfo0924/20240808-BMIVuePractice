@@ -26,18 +26,25 @@
                     <form name="bmiForm" id="bmiForm">
                         <div class="mb-3">
                             <label for="inputName" class="form-label">Name:</label>
-                            <input type="text" class="form-control" id="inputName" required>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="inputName" placeholder="Enter name or generate random">
+                                <button class="btn btn-outline-secondary" type="button" id="generateNameBtn">Generate Name</button>
+                            </div>
                         </div>
                         <div class="mb-3">
-                            <label for="inputWeight" class="form-label">Weight (kg):</label>
-                            <input type="number" class="form-control" id="inputWeight" min="25" max="180" value="60" required>
+                            <label for="inputWeight" class="form-label">Weight: <span id="weightValue">60</span> kg</label>
+                            <input type="range" class="form-range" id="inputWeight" min="25" max="180" value="60">
                         </div>
                         <div class="mb-3">
-                            <label for="inputHeight" class="form-label">Height (cm):</label>
-                            <input type="number" class="form-control" id="inputHeight" min="100" max="220" value="160" required>
+                            <label for="inputHeight" class="form-label">Height: <span id="heightValue">160</span> cm</label>
+                            <input type="range" class="form-range" id="inputHeight" min="100" max="220" value="160">
+                        </div>
+                        <div class="mb-3">
+                            <p>Current BMI: <span id="currentBmi">23.4</span></p>
+                            <p>Status: <span id="currentStatus">Healthy</span></p>
                         </div>
                         <div class="text-center">
-                            <button type="submit" class="btn btn-primary">Calculate and Add</button>
+                            <button type="submit" class="btn btn-primary">Add to List</button>
                         </div>
                     </form>
                 </div>
@@ -73,7 +80,33 @@
     const bmiForm = document.getElementById('bmiForm');
     const bmiDataList = document.getElementById('bmiDataList');
     const generateRandomDataBtn = document.getElementById('generateRandomData');
+    const generateNameBtn = document.getElementById('generateNameBtn');
+    const weightInput = document.getElementById('inputWeight');
+    const heightInput = document.getElementById('inputHeight');
+    const nameInput = document.getElementById('inputName');
+    const weightValue = document.getElementById('weightValue');
+    const heightValue = document.getElementById('heightValue');
+    const currentBmi = document.getElementById('currentBmi');
+    const currentStatus = document.getElementById('currentStatus');
     const people = [];
+
+    const commonNames = [
+        'Alice', 'Bob', 'Charlie', 'David', 'Eve', 'Frank', 'Grace', 'Hannah', 'Ivy', 'James',
+        'Karen', 'Leo', 'Mia', 'Nora', 'Oscar', 'Paul', 'Quinn', 'Ray', 'Sara', 'Tom',
+        'Uma', 'Victor', 'Wendy', 'Xander', 'Yara', 'Zane', 'Emma', 'Liam', 'Olivia', 'Noah',
+        'Ava', 'Ethan', 'Sophia', 'Mason', 'Isabella', 'William', 'Mila', 'James', 'Charlotte', 'Benjamin',
+        'Amelia', 'Elijah', 'Harper', 'Lucas', 'Evelyn', 'Alexander', 'Abigail', 'Daniel', 'Emily', 'Matthew'
+    ];
+
+    let availableNames = [...commonNames];
+
+    function getRandomName() {
+        if (availableNames.length === 0) {
+            availableNames = [...commonNames];
+        }
+        const index = Math.floor(Math.random() * availableNames.length);
+        return availableNames.splice(index, 1)[0];
+    }
 
     function calculateBmi(weight, height) {
         return (weight / Math.pow(height / 100, 2)).toFixed(1);
@@ -110,25 +143,55 @@
 
     function generateRandomData(num) {
         for (let i = 0; i < num; i++) {
-            const name = `Person ${people.length + 1}`;
+            const name = getRandomName();
             const weight = Math.floor(Math.random() * (180 - 25 + 1)) + 25;
             const height = Math.floor(Math.random() * (220 - 100 + 1)) + 100;
             addPerson(name, height, weight);
         }
     }
 
+    function updateCurrentBmi() {
+        const weight = weightInput.value;
+        const height = heightInput.value;
+        const bmi = calculateBmi(weight, height);
+        const status = getBmiStatus(bmi);
+        currentBmi.textContent = bmi;
+        currentStatus.textContent = status;
+    }
+
+    weightInput.addEventListener('input', function() {
+        weightValue.textContent = this.value;
+        updateCurrentBmi();
+    });
+
+    heightInput.addEventListener('input', function() {
+        heightValue.textContent = this.value;
+        updateCurrentBmi();
+    });
+
+    generateNameBtn.addEventListener('click', function() {
+        nameInput.value = getRandomName();
+    });
+
     bmiForm.addEventListener('submit', function(e) {
         e.preventDefault();
-        const name = document.getElementById('inputName').value;
-        const weight = parseFloat(document.getElementById('inputWeight').value);
-        const height = parseFloat(document.getElementById('inputHeight').value);
+        let name = nameInput.value.trim();
+        if (!name) {
+            name = getRandomName();
+            nameInput.value = name;
+        }
+        const weight = parseFloat(weightInput.value);
+        const height = parseFloat(heightInput.value);
         addPerson(name, height, weight);
-        bmiForm.reset();
+        nameInput.value = '';
     });
 
     generateRandomDataBtn.addEventListener('click', function() {
         generateRandomData(50);
     });
+
+    // Initialize current BMI display
+    updateCurrentBmi();
 </script>
 
 </body>
