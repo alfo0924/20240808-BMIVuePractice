@@ -45,13 +45,15 @@
 
 <div class="container">
     <div class="row mb-4">
-        <div class="col-md-6 mx-auto">
-            <div id="mousePointerArea"  style="height: 250px;width: 300px; justify-content: center;  " >
-                <div id="mousePosition">X: 0, Y: 0</div>
+        <div class="col-12 d-flex flex-column align-items-center">
+            <div id="mousePointerArea" style="height: 250px; width: 300px; border: 1px solid #000; position: relative;">
+                <div id="mousePosition" style="position: absolute; top: 10px; left: 10px; background-color: rgba(255,255,255,0.7); padding: 5px;">X: 0, Y: 0</div>
             </div>
-            <button id="enableMouseInput" class="btn btn-primary w-100">Enable Mouse Input</button>
+            <button id="enableMouseInput" class="btn btn-primary mt-3" style="width: 300px;">Enable Mouse Input</button>
         </div>
     </div>
+</div>
+
 <div class="row">
     <div class="col-md-6 mx-auto">
         <div class="card bmiCal">
