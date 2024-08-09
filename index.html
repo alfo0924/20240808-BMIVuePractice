@@ -41,11 +41,9 @@
 <div class="container">
     <div class="row mb-4">
         <div class="col-md-6 mx-auto">
-            <div id="mousePointerArea" style="width: 200px; height: 250px;">
+            <div id="mousePointerArea">
                 <div id="mousePosition">X: 0, Y: 0</div>
             </div>
-
-        </div>
             <button id="enableMouseInput" class="btn btn-primary w-100">Enable Mouse Input</button>
         </div>
     </div>
@@ -64,12 +62,12 @@
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label for="inputWeight" class="form-label">Weight: <span id="weightValue">150</span> kg</label>
-                            <input type="range" class="form-range" id="inputWeight" min="0" max="300" value="150">
+                            <label for="inputWeight" class="form-label">Weight: <span id="weightValue">60</span> kg</label>
+                            <input type="range" class="form-range" id="inputWeight" min="25" max="180" value="60">
                         </div>
                         <div class="mb-3">
-                            <label for="inputHeight" class="form-label">Height: <span id="heightValue">135</span> cm</label>
-                            <input type="range" class="form-range" id="inputHeight" min="20" max="250" value="135">
+                            <label for="inputHeight" class="form-label">Height: <span id="heightValue">160</span> cm</label>
+                            <input type="range" class="form-range" id="inputHeight" min="100" max="220" value="160">
                         </div>
                         <div class="mb-3">
                             <p>Current BMI: <span id="currentBmi">23.4</span></p>
@@ -188,8 +186,8 @@
     function generateRandomData(num) {
         for (let i = 0; i < num; i++) {
             const name = getRandomName();
-            const weight = Math.floor(Math.random() * 301); // 0-300
-            const height = Math.floor(Math.random() * (250 - 20 + 1)) + 20; // 20-250
+            const weight = Math.floor(Math.random() * (180 - 25 + 1)) + 25;
+            const height = Math.floor(Math.random() * (220 - 100 + 1)) + 100;
             addPerson(name, height, weight, true);
         }
     }
@@ -282,28 +280,15 @@
         mousePointerArea.style.cursor = isMouseInputEnabled ? 'crosshair' : 'default';
     });
 
-    mousePointerArea.addEventListener('mousemove', function(e) {
-        const rect = mousePointerArea.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = rect.height - (e.clientY - rect.top); // Invert Y-coordinate
-        mousePosition.textContent = `X: ${x.toFixed(0)}, Y: ${y.toFixed(0)}`;
-    });
-
-    mousePointerArea.addEventListener('mousemove', function(e) {
-        const rect = mousePointerArea.getBoundingClientRect();
-        const x = Math.round(e.clientX - rect.left);
-        const y = Math.round(rect.height - (e.clientY - rect.top));
-        mousePosition.textContent = `Weight : ${x}, Height : ${y}`;
-    });
-
     mousePointerArea.addEventListener('click', function(e) {
         if (!isMouseInputEnabled) return;
 
         const rect = mousePointerArea.getBoundingClientRect();
-        const weight = Math.round(e.clientX - rect.left);
-        const height = Math.round(rect.height - (e.clientY - rect.top));
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
 
-        console.log('Clicked Weight:', weight, 'Clicked Height:', height);
+        const weight = Math.round(25 + (x / rect.width) * 155);
+        const height = Math.round(220 - (y / rect.height) * 120);
 
         weightInput.value = weight;
         heightInput.value = height;
@@ -313,9 +298,8 @@
         updateCurrentBmi();
     });
 
-
-    // // Initialize current BMI display
-    // updateCurrentBmi();
+    // Initialize current BMI display
+    updateCurrentBmi();
 </script>
 
 </body>
