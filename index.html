@@ -19,12 +19,37 @@
         .user-entry {
             background-color: #ffe6e6; /* Light red */
         }
+        #mousePointerArea {
+            width: 100%;
+            height: 300px;
+            border: 2px solid #333;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+        #mousePosition {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 5px;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
 
-
 <div class="container">
+    <div class="row mb-4">
+        <div class="col-md-6 mx-auto">
+            <div id="mousePointerArea" style="width: 200px; height: 250px;">
+                <div id="mousePosition">X: 0, Y: 0</div>
+            </div>
+
+        </div>
+            <button id="enableMouseInput" class="btn btn-primary w-100">Enable Mouse Input</button>
+        </div>
+    </div>
+
     <div class="row">
         <div class="col-md-6 mx-auto">
             <div class="card bmiCal">
@@ -39,12 +64,12 @@
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label for="inputWeight" class="form-label">Weight: <span id="weightValue">60</span> kg</label>
-                            <input type="range" class="form-range" id="inputWeight" min="25" max="180" value="60">
+                            <label for="inputWeight" class="form-label">Weight: <span id="weightValue">150</span> kg</label>
+                            <input type="range" class="form-range" id="inputWeight" min="0" max="300" value="150">
                         </div>
                         <div class="mb-3">
-                            <label for="inputHeight" class="form-label">Height: <span id="heightValue">160</span> cm</label>
-                            <input type="range" class="form-range" id="inputHeight" min="100" max="220" value="160">
+                            <label for="inputHeight" class="form-label">Height: <span id="heightValue">135</span> cm</label>
+                            <input type="range" class="form-range" id="inputHeight" min="20" max="250" value="135">
                         </div>
                         <div class="mb-3">
                             <p>Current BMI: <span id="currentBmi">23.4</span></p>
@@ -93,6 +118,7 @@
     const generateRandomDataBtn = document.getElementById('generateRandomData');
     const generateNameBtn = document.getElementById('generateNameBtn');
     const clearAllRecordsBtn = document.getElementById('clearAllRecords');
+    const downloadCSVBtn = document.getElementById('downloadCSV');
     const weightInput = document.getElementById('inputWeight');
     const heightInput = document.getElementById('inputHeight');
     const nameInput = document.getElementById('inputName');
@@ -100,7 +126,12 @@
     const heightValue = document.getElementById('heightValue');
     const currentBmi = document.getElementById('currentBmi');
     const currentStatus = document.getElementById('currentStatus');
+    const mousePointerArea = document.getElementById('mousePointerArea');
+    const mousePosition = document.getElementById('mousePosition');
+    const enableMouseInputBtn = document.getElementById('enableMouseInput');
     const people = [];
+
+    let isMouseInputEnabled = false;
 
     const commonNames = [
         'Alice', 'Bob', 'Charlie', 'David', 'Eve', 'Frank', 'Grace', 'Hannah', 'Ivy', 'James',
@@ -157,8 +188,8 @@
     function generateRandomData(num) {
         for (let i = 0; i < num; i++) {
             const name = getRandomName();
-            const weight = Math.floor(Math.random() * (180 - 25 + 1)) + 25;
-            const height = Math.floor(Math.random() * (220 - 100 + 1)) + 100;
+            const weight = Math.floor(Math.random() * 301); // 0-300
+            const height = Math.floor(Math.random() * (250 - 20 + 1)) + 20; // 20-250
             addPerson(name, height, weight, true);
         }
     }
@@ -176,6 +207,27 @@
         people.length = 0;
         updateBmiList();
         availableNames = [...commonNames];
+    }
+
+    function downloadCSV() {
+        if (people.length === 0) {
+            alert("No data to download.");
+            return;
+        }
+
+        const csvContent = "data:text/csv;charset=utf-8,"
+            + "Name,Height (cm),Weight (kg),BMI,Status\n"
+            + people.map(person =>
+                `${person.name},${person.height},${person.weight},${person.bmi},${person.status}`
+            ).join("\n");
+
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", "bmi_records.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
     }
 
     weightInput.addEventListener('input', function() {
@@ -215,35 +267,55 @@
         }
     });
 
-    // Initialize current BMI display
-    updateCurrentBmi();
-
-    //download CSV function
-    function downloadCSV() {
-        if (people.length === 0) {
-            alert("No data to download.");
-            return;
-        }
-
-        const csvContent = "data:text/csv;charset=utf-8,"
-            + "Name,Height (cm),Weight (kg),BMI,Status\n"
-            + people.map(person =>
-                `${person.name},${person.height},${person.weight},${person.bmi},${person.status}`
-            ).join("\n");
-
-        const encodedUri = encodeURI(csvContent);
-        const link = document.createElement("a");
-        link.setAttribute("href", encodedUri);
-        link.setAttribute("download", "bmi_records.csv");
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }
-
-    // Add event listener for the download button
-    const downloadCSVBtn = document.getElementById('downloadCSV');
     downloadCSVBtn.addEventListener('click', downloadCSV);
 
+    mousePointerArea.addEventListener('mousemove', function(e) {
+        const rect = mousePointerArea.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        mousePosition.textContent = `X: ${x.toFixed(0)}, Y: ${y.toFixed(0)}`;
+    });
+
+    enableMouseInputBtn.addEventListener('click', function() {
+        isMouseInputEnabled = !isMouseInputEnabled;
+        this.textContent = isMouseInputEnabled ? 'Disable Mouse Input' : 'Enable Mouse Input';
+        mousePointerArea.style.cursor = isMouseInputEnabled ? 'crosshair' : 'default';
+    });
+
+    mousePointerArea.addEventListener('mousemove', function(e) {
+        const rect = mousePointerArea.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = rect.height - (e.clientY - rect.top); // Invert Y-coordinate
+        mousePosition.textContent = `X: ${x.toFixed(0)}, Y: ${y.toFixed(0)}`;
+    });
+
+    mousePointerArea.addEventListener('mousemove', function(e) {
+        const rect = mousePointerArea.getBoundingClientRect();
+        const x = Math.round(e.clientX - rect.left);
+        const y = Math.round(rect.height - (e.clientY - rect.top));
+        mousePosition.textContent = `Weight : ${x}, Height : ${y}`;
+    });
+
+    mousePointerArea.addEventListener('click', function(e) {
+        if (!isMouseInputEnabled) return;
+
+        const rect = mousePointerArea.getBoundingClientRect();
+        const weight = Math.round(e.clientX - rect.left);
+        const height = Math.round(rect.height - (e.clientY - rect.top));
+
+        console.log('Clicked Weight:', weight, 'Clicked Height:', height);
+
+        weightInput.value = weight;
+        heightInput.value = height;
+        weightValue.textContent = weight;
+        heightValue.textContent = height;
+
+        updateCurrentBmi();
+    });
+
+
+    // // Initialize current BMI display
+    // updateCurrentBmi();
 </script>
 
 </body>
